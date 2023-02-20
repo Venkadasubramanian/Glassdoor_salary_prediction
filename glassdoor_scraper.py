@@ -1,5 +1,7 @@
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
 import time
@@ -11,6 +13,7 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
     
     #Initializing the webdriver
     options = webdriver.ChromeOptions()
+    options.add_argument("--disable-notifications")
     
     #Uncomment the line below if you'd like to scrape without a new Chrome window every time.
     #options.add_argument('headless')
@@ -33,14 +36,22 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 time.sleep(sleep_time)
 
                 #Test for the "Sign Up" prompt and get rid of it.
-                
-                try:
-                    driver.find_element(By.XPATH,".//span[@class='SVGInline modal_closeIcon']").click()
-                    done = True
-                except NoSuchElementException:
-                    pass
+                wake_time=2
+                for x in range(0,4):
+                    try:
+                        driver.find_element(By.XPATH,".//div[@id='LoginModal']//span[@alt='Close']").click()
+                        str_error = None
+                        done = True
+                    except NoSuchElementException as e:
+                        str_error = str(e)
+                    if str_error:
+                        time.sleep(wake_time)
+                        wake_time *=2
+                    else:
+                        pass
+                    time.sleep(2)
 
-                time.sleep(.1)
+                time.sleep(3)
 
                 print("Progress: {}".format("" + str(len(jobs)) + "/" + str(num_jobs)))
                 if len(jobs) >= num_jobs:
