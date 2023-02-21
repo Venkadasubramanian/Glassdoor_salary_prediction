@@ -29,6 +29,7 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
         done = False
         while not done:
             #Going through each job in this page
+            # job_buttons = driver.find_elements(By.XPATH,"//article[@id='MainCol']//ul/a[@class='joblink']")  #These are the buttons we're going to click.
             job_buttons = driver.find_elements(By.XPATH,"//article[@id='MainCol']//ul/li[@data-adv-type='GENERAL']")  #These are the buttons we're going to click.
             for job_button in job_buttons:  
                 #Let the page load. Change this number based on your internet speed.
@@ -36,22 +37,30 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 time.sleep(sleep_time)
 
                 #Test for the "Sign Up" prompt and get rid of it.
-                wake_time=2
-                for x in range(0,4):
-                    try:
-                        driver.find_element(By.XPATH,".//div[@id='LoginModal']//span[@alt='Close']").click()
-                        str_error = None
-                        done = True
-                    except NoSuchElementException as e:
-                        str_error = str(e)
-                    if str_error:
-                        time.sleep(wake_time)
-                        wake_time *=2
-                    else:
-                        pass
-                    time.sleep(2)
+##---------------- Simmpler code to close the pop-up prompts-------##
+                try:
+                    element = driver.find_element(By.XPATH,".//span[@alt='Close']")
+                    driver.execute_script("arguments[0].click();",element)
+                except:
+                    NoSuchElementException
 
-                time.sleep(3)
+##----------------Old code to close the pop-up prompt--------------##
+                # wake_time=2
+                # for x in range(0,4):
+                #     try:
+                #         driver.find_element(By.XPATH,".//div[@id='LoginModal']//span[@alt='Close']").click()
+                #         str_error = None
+                #         #done = True
+                #     except NoSuchElementException as e:
+                #         str_error = str(e)
+                #     if str_error:
+                #         time.sleep(wake_time)
+                #         wake_time *=2
+                #     else:
+                #         break
+                #     time.sleep(2)
+
+                time.sleep(0.1)
 
                 print("Progress: {}".format("" + str(len(jobs)) + "/" + str(num_jobs)))
                 if len(jobs) >= num_jobs:
@@ -63,23 +72,23 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 
                 while not collected_successfully:
                     try:
-                        company_name = driver.find_element(By.XPATH,"//div[@data-test='employerName']").text
-                        location = driver.find_element(By.XPATH,"//div[@data-test='location']").text
-                        job_title = driver.find_element(By.XPATH,"//div[@data-test='jobTitle']").text
-                        job_description = driver.find_element(By.XPATH,"//div[@id='JobDescriptionContainer']").text
+                        company_name = driver.find_element(By.XPATH,".//div[@data-test='employerName']").text
+                        location = driver.find_element(By.XPATH,".//div[@data-test='location']").text
+                        job_title = driver.find_element(By.XPATH,".//div[@data-test='jobTitle']").text
+                        job_description = driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']").text
                         collected_successfully = True
                     except:
                         time.sleep(5)
 
-                try:
-                    salary_estimate = driver.find_element(By.XPATH,"//span[@data-test='detailSalary']").text
-                except NoSuchElementException:
-                    salary_estimate = -1 #You need to set a "not found value. It's important."
+                    try:
+                        salary_estimate = driver.find_element(By.XPATH,".//div[@class='css-w04er4 e1tk4kwz6']//span[@data-test='detailSalary']").text
+                    except NoSuchElementException:
+                        salary_estimate = -1 #You need to set a "not found value. It's important."
                 
-                try:
-                    rating = driver.find_element(By.XPATH,'//span[@data-test="detailRating"]').text
-                except NoSuchElementException:
-                    rating = -1 #You need to set a "not found value. It's important."
+                    try:
+                        rating = driver.find_element(By.XPATH,'.//span[@data-test="detailRating"]').text
+                    except NoSuchElementException:
+                        rating = -1 #You need to set a "not found value. It's important."
 
                 # Printing for debugging
                 if verbose:
@@ -99,22 +108,22 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
             # #         #    <label>Headquarters</label>
             # #         #    <span class="value">San Francisco, CA</span>
             # #         #</div>
-                    headquarters = driver.find_element(By.XPATH,'//div[@id="CompanyContainer"]//span[text()="Headquarters"]//following-sibling::*').text
+                    headquarters = driver.find_element(By.XPATH,'.//div[@id="CompanyContainer"]//span[text()="Headquarters"]//following-sibling::*').text
                 except NoSuchElementException:
                     headquarters = -1
 
                 try:
-                    size = driver.find_element(By.XPATH,'//div[@id="CompanyContainer"]//span[text()="size"]//following-sibling::*').text
+                    size = driver.find_element(By.XPATH,'.//div[@id="CompanyContainer"]//span[text()="size"]//following-sibling::*').text
                 except NoSuchElementException:
                     size = -1
 
                 try:
-                    founded = driver.find_element(By.XPATH,'//div[@id="CompanyContainer"]//span[text()="Founded"]//following-sibling::*').text
+                    founded = driver.find_element(By.XPATH,'.//div[@id="CompanyContainer"]//span[text()="Founded"]//following-sibling::*').text
                 except NoSuchElementException:
                     founded = -1
 
                 try:
-                    type_of_ownership = driver.find_element(By.XPATH,'//div[@id="CompanyContainer"]//span[text()="Type"]//following-sibling::*').text
+                    type_of_ownership = driver.find_element(By.XPATH,'.//div[@id="CompanyContainer"]//span[text()="Type"]//following-sibling::*').text
                 except NoSuchElementException:
                     type_of_ownership = -1
 
@@ -134,7 +143,7 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                     revenue = -1
 
                 try:
-                    competitors = driver.find_element(By.XPATH,'//div[@id="CompanyContainer"]//span[text()="Competitors"]//following-sibling::*').text
+                    competitors = driver.find_element(By.XPATH,'.//div[@id="CompanyContainer"]//span[text()="Competitors"]//following-sibling::*').text
                 except NoSuchElementException:
                     competitors = -1
                     
