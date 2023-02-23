@@ -43,8 +43,14 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                     driver.execute_script("arguments[0].click();",element)
                 except:
                     NoSuchElementException
+                #To Click "Refresh Page Button"
+                try:
+                    element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
+                    driver.execute_script("argument[0].click()",element_1)
+                except:
+                    NoSuchElementException
 
-##----------------Old code to close the pop-up prompt--------------##
+##--------------------------Old code to close the pop-up prompt --------------------------##
                 # wake_time=2
                 # for x in range(0,4):
                 #     try:
@@ -61,15 +67,21 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 #     time.sleep(2)
 
                 time.sleep(0.1)
-
+##---------------------------- Print the Progess of each job --------------------------##
                 print("Progress: {}".format("" + str(len(jobs)) + "/" + str(num_jobs)))
                 if len(jobs) >= num_jobs:
                     break
-
+##------------------------------ Click each job posting ------------------------------##
                 job_button.click()  #You might 
                 time.sleep(1)
+                #To Click "Refresh Page Button"
+                try:
+                    element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
+                    driver.execute_script("argument[0].click()",element_1)
+                except:
+                    NoSuchElementException
                 collected_successfully = False
-                
+##-------------------------- Collect necessary data from each job posting --------------------------##
                 while not collected_successfully:
                     try:
                         company_name = driver.find_element(By.XPATH,".//div[@data-test='employerName']").text
@@ -157,7 +169,8 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                     print("Revenue: {}".format(revenue))
                     print("Competitors: {}".format(competitors))
                     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
+                    
+##--------------------------------- Store every collected data as a dictionary --------------------##
                 jobs.append({"Job Title" : job_title,
                 "Salary Estimate" : salary_estimate,
                 "Job Description" : job_description,
@@ -176,11 +189,18 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 #add job to jobs
                 
                 done = True
+
+##-------------------- Move to next page after clicking all job posting in a page ---------------##
         #Clicking on the "next page" button
-        if done:
-            driver.find_element(By.XPATH,"//span[@alt='next-icon']").click()   
-            time.sleep(sleep_time)
-        else:
-            break
+            if done:
+                try:
+                    element = driver.find_element(By.XPATH,".//span[@alt='Close']")
+                    driver.execute_script("arguments[0].click();",element)
+                except:
+                    NoSuchElementException
+                driver.find_element(By.XPATH,"//span[@alt='next-icon']").click()   
+                time.sleep(sleep_time)
+            else:
+                break
 
     return pd.DataFrame(jobs)  #This line converts the dictionary object into a pandas DataFrame.
