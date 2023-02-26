@@ -87,11 +87,15 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                         company_name = driver.find_element(By.XPATH,".//div[@data-test='employerName']").text
                         location = driver.find_element(By.XPATH,".//div[@data-test='location']").text
                         job_title = driver.find_element(By.XPATH,".//div[@data-test='jobTitle']").text
-                        job_description = driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']").text
                         collected_successfully = True
                     except:
                         time.sleep(5)
-
+                    try:
+                        driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']//span[@class=class='SVGInline']").click()
+                        time.sleep(0.5) 
+                        job_description = driver.find_element(By.XPATH,".//div[@class='jobDescriptionContent desc']").text
+                    except NoSuchElementException:
+                        size = -1
                     try:
                         salary_estimate = driver.find_element(By.XPATH,".//div[@class='css-w04er4 e1tk4kwz6']//span[@data-test='detailSalary']").text
                     except NoSuchElementException:
