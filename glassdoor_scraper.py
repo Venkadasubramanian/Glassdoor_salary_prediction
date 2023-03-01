@@ -16,7 +16,7 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
     options.add_argument("--disable-notifications")
     
     #Uncomment the line below if you'd like to scrape without a new Chrome window every time.
-    #options.add_argument('headless')
+    # options.add_argument('headless')
     
     #Change the path to where chromedriver is in your home folder.
     driver = webdriver.Chrome(executable_path=path, options=options)
@@ -46,7 +46,7 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 #To Click "Refresh Page Button"
                 try:
                     element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
-                    driver.execute_script("argument[0].click()",element_1)
+                    driver.execute_script("arguments[0].click()",element_1)
                 except:
                     NoSuchElementException
 
@@ -77,25 +77,23 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                 #To Click "Refresh Page Button"
                 try:
                     element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
-                    driver.execute_script("argument[0].click()",element_1)
+                    driver.execute_script("arguments[0].click()",element_1)
                 except:
                     NoSuchElementException
-                collected_successfully = False
+                
 ##-------------------------- Collect necessary data from each job posting --------------------------##
+                collected_successfully = False
                 while not collected_successfully:
                     try:
                         company_name = driver.find_element(By.XPATH,".//div[@data-test='employerName']").text
                         location = driver.find_element(By.XPATH,".//div[@data-test='location']").text
                         job_title = driver.find_element(By.XPATH,".//div[@data-test='jobTitle']").text
+                        job_description = driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']").text
+
                         collected_successfully = True
                     except:
                         time.sleep(5)
-                    try:
-                        driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']//span[@class=class='SVGInline']").click()
-                        time.sleep(0.5) 
-                        job_description = driver.find_element(By.XPATH,".//div[@class='jobDescriptionContent desc']").text
-                    except NoSuchElementException:
-                        size = -1
+
                     try:
                         salary_estimate = driver.find_element(By.XPATH,".//div[@class='css-w04er4 e1tk4kwz6']//span[@data-test='detailSalary']").text
                     except NoSuchElementException:
