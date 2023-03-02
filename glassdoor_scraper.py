@@ -3,6 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver import ActionChains
+
 
 import time
 import pandas as pd
@@ -29,51 +31,44 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
         done = False
         while not done:
             #Going through each job in this page
-            # job_buttons = driver.find_elements(By.XPATH,"//article[@id='MainCol']//ul/a[@class='joblink']")  #These are the buttons we're going to click.
-            job_buttons = driver.find_elements(By.XPATH,"//article[@id='MainCol']//ul/li[@data-adv-type='GENERAL']")  #These are the buttons we're going to click.
+            job_buttons = driver.find_elements(By.XPATH,".//article[@id='MainCol']//ul/li[@data-test='jobListing']")  #These are the buttons we're going to click.
             for job_button in job_buttons:  
                 #Let the page load. Change this number based on your internet speed.
                 # Or, wait until the webpage is loaded, instead of hardcoding it.
-                time.sleep(sleep_time)
+                # time.sleep(sleep_time)
 
                 #Test for the "Sign Up" prompt and get rid of it.
-##---------------- Simmpler code to close the pop-up prompts-------##
+##---------------- Simpler code to close the pop-up prompts-------##
                 try:
-                    element = driver.find_element(By.XPATH,".//span[@alt='Close']")
-                    driver.execute_script("arguments[0].click();",element)
+                    
+                    signup_element = driver.find_element(By.XPATH,".//div[@class='background-overlay']//span[@alt='Close']")
+                    WebDriverWait(driver,sleep_time).until(EC.presence_of_element_located(signup_element)).click()
+                    # driver.execute_script("arguments[0].click();",signup_element)
                 except:
                     NoSuchElementException
                 #To Click "Refresh Page Button"
-                try:
-                    element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
-                    driver.execute_script("arguments[0].click()",element_1)
-                except:
-                    NoSuchElementException
-
-##--------------------------Old code to close the pop-up prompt --------------------------##
-                # wake_time=2
-                # for x in range(0,4):
-                #     try:
-                #         driver.find_element(By.XPATH,".//div[@id='LoginModal']//span[@alt='Close']").click()
-                #         str_error = None
-                #         #done = True
-                #     except NoSuchElementException as e:
-                #         str_error = str(e)
-                #     if str_error:
-                #         time.sleep(wake_time)
-                #         wake_time *=2
-                #     else:
-                #         break
-                #     time.sleep(2)
+                # try:
+                #     element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
+                #     driver.execute_script("arguments[0].click()",element_1)
+                # except:
+                #     NoSuchElementException
 
                 time.sleep(0.1)
 ##---------------------------- Print the Progess of each job --------------------------##
                 print("Progress: {}".format("" + str(len(jobs)) + "/" + str(num_jobs)))
                 if len(jobs) >= num_jobs:
                     break
-##------------------------------ Click each job posting ------------------------------##
-                job_button.click()  #You might 
+##------------------------------ Click each job posting ------------------------------##               
+                # try:
+                    # WebDriverWait(driver, 5).until(EC.invisibility_of_element_located((By.XPATH, ".//div[@class='background-overlay']")))
+                target_element = WebDriverWait(driver,1).until(EC.element_to_be_clickable(job_button))
+                ActionChains(driver).move_to_element(target_element).click().perform()
                 time.sleep(1)
+                # except:   
+                #     if ElementClickInterceptedException:
+                #         actions = ActionChains(driver)
+                #         actions.move_to_element(job_button).click().perform()
+
                 #To Click "Refresh Page Button"
                 try:
                     element_1 = driver.find_element(By.XPATH,".//div[@id='JDCol']//button[@type='button']")
@@ -88,9 +83,13 @@ def get_jobs(keyword, num_jobs, verbose, path, sleep_time):
                         company_name = driver.find_element(By.XPATH,".//div[@data-test='employerName']").text
                         location = driver.find_element(By.XPATH,".//div[@data-test='location']").text
                         job_title = driver.find_element(By.XPATH,".//div[@data-test='jobTitle']").text
-                        job_description = driver.find_element(By.XPATH,".//div[@id='JobDescriptionContainer']").text
 
-                        collected_successfully = True
+                    # click on the "Show more" button
+                        show_more_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, ".//div[@class='css-t3xrds e856ufb4']")))
+                        show_more_button.click()
+                        # wait for the text to load
+                        element_with_text = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, ".//div[@id='JobDescriptionContainer']")))
+                        job_description = element_with_text.text
                     except:
                         time.sleep(5)
 
